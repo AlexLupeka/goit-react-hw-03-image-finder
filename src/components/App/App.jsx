@@ -8,17 +8,18 @@ import { Error } from '../Error/Error';
 import api from '../pixabayApi/pixabay-api';
 import { ImageGallery } from '../ImageGallery/ImageGallery';
 
-const Status = {
-  IDLE: 'idle',
-  PENDING: 'pending',
-  RESOLVED: 'resolved',
-  REJECTED: 'rejected',
-};
+// const Status = {
+//   IDLE: 'idle',
+//   PENDING: 'pending',
+//   RESOLVED: 'resolved',
+//   REJECTED: 'rejected',
+// };
 
 export class App extends Component {
   state = {
     error: null,
     status: 'idle',
+    isLoading: false,
     query: '',
     page: 1,
     images: [],
@@ -33,7 +34,7 @@ export class App extends Component {
     const nextQuery = this.state.query;
 
     if (prevQuery !== nextQuery) {
-      this.setState({ status: Status.PENDING });
+      this.setState({ isLoading: true, error: null });
       this.renderImages();
     }
   }
@@ -52,12 +53,12 @@ export class App extends Component {
           );
         }
       })
-      .catch(error => this.setState({ error, status: Status.REJECTED }))
-      .finally(() => this.setState({ status: Status.RESOLVED }));
+      .catch(error => this.setState({ error }))
+      .finally(() => this.setState({ isLoading: false }));
   };
 
   render() {
-    const { status, error } = this.state;
+    const { query, error, images, isLoading } = this.state;
 
     return (
       <Container>
@@ -74,15 +75,15 @@ export class App extends Component {
           pauseOnHover
           theme="light"
         />
-        {status === Status.IDLE && (
+        {!query && (
           <ContainerText>
             Let's go to search all what you want! <b /> Just enter a word and we
             will show a picture!
           </ContainerText>
         )}
-        {status === Status.PENDING && <Loader />}
-        {status === Status.REJECTED && <Error message={error.message} />}
-        {status === Status.RESOLVED && (
+        {isLoading && <Loader />}
+        {error && <Error />}
+        {images.length >= 12 && (
           <>
             <ImageGallery images={this.state.images} />
             <Button onClick={this.renderImages} />
