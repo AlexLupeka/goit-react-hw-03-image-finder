@@ -8,17 +8,9 @@ import { Error } from '../Error/Error';
 import api from '../pixabayApi/pixabay-api';
 import { ImageGallery } from '../ImageGallery/ImageGallery';
 
-// const Status = {
-//   IDLE: 'idle',
-//   PENDING: 'pending',
-//   RESOLVED: 'resolved',
-//   REJECTED: 'rejected',
-// };
-
 export class App extends Component {
   state = {
     error: null,
-    status: 'idle',
     isLoading: false,
     query: '',
     page: 1,
@@ -83,12 +75,10 @@ export class App extends Component {
         )}
         {isLoading && <Loader />}
         {error && <Error />}
-        {images.length >= 12 && (
-          <>
-            <ImageGallery images={this.state.images} />
-            <Button onClick={this.renderImages} />
-          </>
-        )}
+        <>
+          <ImageGallery images={this.state.images} />
+          {images.length >= 12 && <Button onClick={this.renderImages} />}
+        </>
       </Container>
     );
   }
